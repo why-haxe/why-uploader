@@ -1,0 +1,3 @@
+-D why-uploader=0.0.0
+-cp src
+--macro Sys.println("haxe_libraries/why-uploader.hxml:2: [Warning] Using dev version of library why-uploader")

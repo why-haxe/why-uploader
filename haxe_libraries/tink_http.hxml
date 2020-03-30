@@ -1,0 +1,7 @@
+-lib tink_anon
+-lib tink_io
+-lib tink_url
+-lib http-status
+-D tink_http=0.9.1
+-cp ../tink_http/src
+--macro Sys.println("haxe_libraries/tink_http.hxml:6: [Warning] Using dev version of library tink_http")
