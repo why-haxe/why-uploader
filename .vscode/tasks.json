@@ -7,7 +7,23 @@
 			"label": "test",
 			"type": "shell",
 			"command": "lix",
-			"args": ["run","travix","run","js"],
+			"args": [
+				"run",
+				"travix",
+				"run",
+				"js"
+			],
+			"problemMatcher": [
+				"$haxe-absolute",
+				"$haxe",
+				"$haxe-error",
+				"$haxe-trace"
+			],
+			"group": "build"
+		},
+		{
+			"type": "haxe",
+			"args": "active configuration",
 			"problemMatcher": [
 				"$haxe-absolute",
 				"$haxe",
@@ -17,7 +33,8 @@
 			"group": {
 				"kind": "build",
 				"isDefault": true
-			}
+			},
+			"label": "haxe: active configuration"
 		}
 	]
 }

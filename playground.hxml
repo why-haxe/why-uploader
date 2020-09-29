@@ -1,0 +1,7 @@
+-cp tests
+-main Playground
+-js bin/playground.js
+
+-lib why-uploader
+
+-D no-deprecation-warnings
