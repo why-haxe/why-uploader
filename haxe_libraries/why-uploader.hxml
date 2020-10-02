@@ -3,3 +3,4 @@
 --macro Sys.println("haxe_libraries/why-uploader.hxml:2: [Warning] Using dev version of library why-uploader")
 
 -lib tink_http
+-lib tink_json

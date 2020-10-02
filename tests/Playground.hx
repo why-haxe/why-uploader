@@ -1,6 +1,5 @@
 package;
 
-import why.uploader.remote.GoogleCloudStorage.GoogleCloudStorageDestination;
 import why.uploader.*;
 import why.uploader.local.*;
 import why.uploader.remote.*;
@@ -12,8 +11,9 @@ class Playground {
 	static function main() {
 		final local = new Browser();
 		final remote = new GoogleCloudStorage(o -> tink.Url.parse('gcs://${o.bucket}/${o.name}'));
-
+		S3;
 		Manager.create(local, remote, BrowserRecorder.new).handle(o -> switch o {
+
 			case Success(manager):
 				manager.initiate('', {bucket: 'buck', name: 'path/to/file.jpg'}).next(upload -> {
 					final progress = upload.start(); // Progress<Outcome<Noise, Error>>, will record progress to local storage

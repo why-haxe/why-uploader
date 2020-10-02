@@ -6,6 +6,7 @@ import js.Browser.window;
 
 using tink.CoreApi;
 
+// TODO: use indexeddb to store large files
 class BrowserRecorder<Src, Dest> implements Recorder<Src, Dest> {
 	final storage:Storage;
 	final local:Local<Src>;
@@ -19,12 +20,13 @@ class BrowserRecorder<Src, Dest> implements Recorder<Src, Dest> {
 		this.prefix = 'why-uploader:${local.slug()}:${remote.slug()}';
 	}
 
-	public function record(upload:Upload<Src, Dest>, offset:BigInt):Promise<Noise> {
+	public function record(upload:Upload<Src, Dest>, section:BigInt):Promise<Noise> {
 		final id = upload.id;
 
 		final sourceKey = '$prefix:$id:source';
 		final destinationKey = '$prefix:$id:destination';
-		final offsetKey = '$prefix:$id:offset';
+		final sectionKey = '$prefix:$id:section';
+		final chunkSizeKey = '$prefix:$id:chunkSize';
 
 		final fields = Reflect.fields(storage);
 
@@ -39,7 +41,8 @@ class BrowserRecorder<Src, Dest> implements Recorder<Src, Dest> {
 		if (!fields.contains(destinationKey))
 			storage.setItem(destinationKey, upload.destination.serialize().toHex());
 
-		storage.setItem(offsetKey, '$offset');
+		storage.setItem(sectionKey, '$section');
+		storage.setItem(chunkSizeKey, '${upload.chunkSize}');
 
 		return Promise.inParallel(tasks);
 	}
@@ -48,7 +51,8 @@ class BrowserRecorder<Src, Dest> implements Recorder<Src, Dest> {
 		final id = upload.id;
 		storage.removeItem('$prefix:$id:source');
 		storage.removeItem('$prefix:$id:destination');
-		storage.removeItem('$prefix:$id:offset');
+		storage.removeItem('$prefix:$id:section');
+		storage.removeItem('$prefix:$id:chunkSize');
 		return Promise.NOISE;
 	}
 
@@ -63,15 +67,17 @@ class BrowserRecorder<Src, Dest> implements Recorder<Src, Dest> {
 				final id = regex.matched(1);
 				final source = storage.getItem('$prefix:$id:source');
 				final destination = storage.getItem('$prefix:$id:destination');
-				final offset = storage.getItem('$prefix:$id:offset'); // consider incorporating offset when serializing source (e.g. only serialize not-yet-uploaded part)
+				final section = storage.getItem('$prefix:$id:section'); // consider incorporating offset when serializing source (e.g. only serialize not-yet-uploaded part)
+				final chunkSize = storage.getItem('$prefix:$id:chunkSize');
 
 				switch [
 					local.unserializeSource(Chunk.ofHex(source)),
 					remote.unserializeDestination(Chunk.ofHex(destination)),
-					Std.parseFloat(offset)
+					Std.parseInt(section),
+					Std.parseInt(chunkSize),
 				] {
-					case [Success(source), Success(destination), offset] if (!Math.isNaN(offset)):
-						uploads.push(new Upload(id, this, source, destination, offset));
+					case [Success(source), Success(destination), section, chunkSize] if (section != null && chunkSize != null):
+						uploads.push(new Upload(id, this, source, destination, section, chunkSize));
 					case _: // skip
 				}
 			}

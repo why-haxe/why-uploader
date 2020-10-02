@@ -13,14 +13,14 @@ typedef GoogleCloudStoragePath = {
 	final name:String;
 }
 
-class GoogleCloudStorage<Name> implements Remote<Name> {
-	final getSessionUri:Name->Promise<Url>;
+class GoogleCloudStorage implements Remote<GoogleCloudStoragePath> {
+	final getSessionUri:GoogleCloudStoragePath->Promise<Url>;
 
 	public function new(getSessionUri) {
 		this.getSessionUri = getSessionUri;
 	}
 
-	public function makeDestination(name:Name):Promise<Destination> {
+	public function makeDestination(name:GoogleCloudStoragePath):Promise<Destination> {
 		return getSessionUri(name).next(uri -> (new GoogleCloudStorageDestination(uri) : Destination));
 	}
 
@@ -42,7 +42,7 @@ class GoogleCloudStorageDestination implements Destination {
 		this.id = this.sessionUri = sessionUri;
 	}
 
-	public function range(offset:BigInt, length:BigInt, total:Option<BigInt>):Promise<OutgoingRequestHeader> {
+	public function range(_:Int, offset:BigInt, length:BigInt, total:Option<BigInt>):Promise<OutgoingRequestHeader> {
 		final first = offset;
 		final last = offset + length - 1;
 		final total = switch total {
